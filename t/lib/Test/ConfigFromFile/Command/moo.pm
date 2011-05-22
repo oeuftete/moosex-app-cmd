@@ -19,6 +19,13 @@ has 'moo' => (
     documentation => "required option field",
 );
 
+has 'check' => (
+    traits      => [qw(Getopt)],
+    isa         => "Int",
+    is          => 'ro',
+    cmd_aliases => [qw(c C)],
+);
+
 sub execute {
   my ($self, $opt, $arg) =@_;
 
