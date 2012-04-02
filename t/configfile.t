@@ -104,6 +104,6 @@ my @configfile_args = qw(--configfile=t/lib/Test/ConfigFromFile/config.yaml);
     eval { $cmd->run };
 
     like( $@, $success,
-        'command succeeded with -c option followed by configfile option',
+        'command succeeded with -C option preceded by configfile option',
     );
 }
