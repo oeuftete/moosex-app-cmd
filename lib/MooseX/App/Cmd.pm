@@ -1,49 +1,43 @@
-#!/usr/bin/perl
+use 5.006;
 
 package MooseX::App::Cmd;
-use File::Basename ();
 use Moose;
+use English '-no_match_vars';
+use File::Basename ();
 
+# VERSION
+use MooseX::MarkAsMethods autoclean => 1;
 extends qw(Moose::Object App::Cmd);
 
 sub BUILDARGS {
-  my $class = shift;
-  return {} unless @_;
-  return { arg => $_[0] } if @_ == 1;;
-  return { @_ };
+    my ( undef, @arg ) = @_;
+    return {} if !@arg;
+    return { arg => $arg[0] } if @arg == 1;
+    return {@arg};
 }
 
 sub BUILD {
-  my ($self,$args) = @_;
-
-  my $class = blessed $self;
-  my $arg0 = $0;
-  $self->{arg0}      = File::Basename::basename($arg0);
-  $self->{command}   = $class->_command( {}  );
-  $self->{full_arg0} = $arg0;
+    my $self  = shift;
+    my $class = blessed $self;
+    $self->{arg0}      = File::Basename::basename($PROGRAM_NAME);
+    $self->{command}   = $class->_command( {} );
+    $self->{full_arg0} = $PROGRAM_NAME;
+    return;
 }
 
-our $VERSION = "0.06";
+## no critic (Modules::RequireExplicitInclusion)
+__PACKAGE__->meta->make_immutable();
+no Moose;
+1;
 
-__PACKAGE__;
-
-__END__
-
-=pod
-
-=head1 NAME
-
-MooseX::App::Cmd - Mashes up L<MooseX::Getopt> and L<App::Cmd>.
+# ABSTRACT: Mashes up MooseX::Getopt and App::Cmd
 
 =head1 SYNOPSIS
-
-See L<App::Cmd/SYNOPSIS>.
 
     package YourApp::Cmd;
 	use Moose;
 
     extends qw(MooseX::App::Cmd);
-
 
 
     package YourApp::Cmd::Command::blort;
@@ -53,59 +47,61 @@ See L<App::Cmd/SYNOPSIS>.
 
     has blortex => (
         traits => [qw(Getopt)],
-        isa => "Bool",
-        is  => "rw",
-        cmd_aliases   => "X",
-        documentation => "use the blortext algorithm",
+        isa => 'Bool',
+        is  => 'rw',
+        cmd_aliases   => 'X',
+        documentation => 'use the blortext algorithm',
     );
 
     has recheck => (
         traits => [qw(Getopt)],
-        isa => "Bool",
-        is  => "rw",
-        cmd_aliases => "r",
-        documentation => "recheck all results",
+        isa => 'Bool',
+        is  => 'rw',
+        cmd_aliases => 'r',
+        documentation => 'recheck all results',
     );
 
     sub execute {
         my ( $self, $opt, $args ) = @_;
 
         # you may ignore $opt, it's in the attributes anyway
-        
+
         my $result = $self->blortex ? blortex() : blort();
 
         recheck($result) if $self->recheck;
 
         print $result;
-    } 
+    }
 
 =head1 DESCRIPTION
 
-This module marries L<App::Cmd> with L<MooseX::Getopt>.
+This module marries L<App::Cmd|App::Cmd> with L<MooseX::Getopt|MooseX::Getopt>.
 
-Use it like L<App::Cmd> advises (especially see L<App::Cmd::Tutorial>),
-swapping L<App::Cmd::Command> for L<MooseX::App::Cmd::Command>.
+Use it like L<App::Cmd|App::Cmd> advises (especially see
+L<App::Cmd::Tutorial|App::Cmd::Tutorial>), swapping
+L<App::Cmd::Command|App::Cmd::Command> for
+L<MooseX::App::Cmd::Command|MooseX::App::Cmd::Command>.
 
-Then you can write your moose commands as moose classes, with L<MooseX::Getopt>
+Then you can write your moose commands as Moose classes, with
+L<MooseX::Getopt|MooseX::Getopt>
 defining the options for you instead of C<opt_spec> returning a
-L<Getopt::Long::Descriptive> spec.
+L<Getopt::Long::Descriptive|Getopt::Long::Descriptive> spec.
 
-=head1 AUTHOR
+=method BUILD
 
-Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
+After calling C<new> this method is automatically run, setting underlying
+L<App::Cmd|App::Cmd> attributes as per its documentation.
 
-With contributions from:
+=head1 SEE ALSO
 
-=over 4
+=over
 
-=item Guillermo Roditi E<lt>groditi@cpan.orgE<gt>
+=item L<App::Cmd|App::Cmd>
+
+=item L<App::Cmd::Tutorial|App::Cmd::Tutorial>
+
+=item L<MooseX::Getopt|MooseX::Getopt>
+
+=item L<MooseX::App::Cmd::Command|MooseX::App::Cmd::Command>
 
 =back
-
-=head1 COPYRIGHT
-
-    Copyright (c) 2007-2008 Infinity Interactive, Yuval Kogman. All rights
-    reserved This program is free software; you can redistribute it and/or
-    modify it under the same terms as Perl itself.
-
-=cut
