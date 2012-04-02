@@ -14,7 +14,7 @@ BEGIN {
             'These tests require MooseX::ConfigFromFile and YAML';
     }
     else {
-        plan tests => 10;
+        plan tests => 9;
     }
 }
 
@@ -30,17 +30,6 @@ my $cmd = Test::ConfigFromFile->new;
     like(
         $@,
         qr/Mandatory parameter 'moo' missing in call to \(eval\)/,
-        'command died with the correct string',
-    );
-}
-
-{
-    local @ARGV = qw(moo --configfile=t/lib/Test/ConfigFromFile/config.yaml);
-    eval { $cmd->run };
-
-    like(
-        $@,
-        qr/cows go moo1 moo2 moo3/,
         'command died with the correct string',
     );
 }
