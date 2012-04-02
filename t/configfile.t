@@ -14,7 +14,7 @@ BEGIN {
             'These tests require MooseX::ConfigFromFile and YAML';
     }
     else {
-        plan tests => 9;
+        plan tests => 10;
     }
 }
 
@@ -69,7 +69,22 @@ my @configfile_args = qw(--configfile=t/lib/Test/ConfigFromFile/config.yaml);
     local @ARGV = ( qw(moo --check 19), @configfile_args );
     eval { $cmd->run };
 
-    like( $@, $success, 'command succeeded with long c-option', );
+    like(
+        $@,
+        $success,
+        'command succeeded with long c-option followed by configfile option',
+    );
+}
+
+{
+    local @ARGV = ( 'moo', @configfile_args, qw(--check 19) );
+    eval { $cmd->run };
+
+    like(
+        $@,
+        $success,
+        'command succeeded with long c-option preceded by configfile option',
+    );
 }
 
 {
